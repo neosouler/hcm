@@ -9,7 +9,8 @@ now = datetime.datetime.now()
 import calculate
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI']='postgresql://postgres:postgres@localhost/hcm'
+#app.config['SQLALCHEMY_DATABASE_URI']='postgresql://postgres:postgres@localhost/hcm'
+app.config['SQLALCHEMY_DATABASE_URI']='postgres://ujsecbijerrvjy:6f902fcecbd65d98af03b8afe6e8f1db91d68dc7802eeb4ef5b7fcfa77d7ac42@ec2-107-21-224-76.compute-1.amazonaws.com:5432/d9c9ung4cv9io3?sslmode=require'
 db = SQLAlchemy(app)
 
 class Payment(db.Model):
