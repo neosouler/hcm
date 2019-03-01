@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <title>황총무</title>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale1.0,user-scalable=no">
+        <link rel="shortcut icon" href="../static/img/favicon.ico">
+        <link href="../static/css/main.css" rel="stylesheet">
+        <script src="../static/js/jquery-1.12.4.js"></script>
+        <script src="../static/js/jquery-ui.js"></script>
+        <script type=text/javascript>
+            $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+        
+            $(function() {
+                $('input[type="text"]').keydown(function() {
+                    if (event.keyCode === 13) {
+                        event.preventDefault();
+                    }
+                });
+
+                function checkValidation(round_nm, round_price, send_cnt, pay_round_mst_init) {
+                    var numbers = /^[0-9]+$/;
+                    
+                    if (round_nm == "") {
+                        alert("회차명을 입력해주세요!");
+                        return "0";
+                    } else if (round_price == "") {
+                        alert("금액을 입력해주세요!");
+                        return "0";
+                    } else if (!round_price.match(numbers)) {
+                        alert("금액은 숫자만 입력해주세요!");
+                        return "0";
+                    } else if (send_cnt == 0) {
+                        alert("멤버를 한 명 이상 꼭 선택해주세요!");
+                        return "0";
+                    } else if (pay_round_mst_init == "총무") {
+                        alert("결제자를 선택해주세요!");
+                        return "0";
+                    } else {
+                        return "1"
+                    }
+                }
+                
+                $('button#add_pay_round').off().on('click', function() {
+                    var pay_id = $("#pay_id").val();
+
+                    //for round name, price
+                    var round_nm = $("#round_nm").val();
+                    var round_price = $("#round_price").val();
+                    
+                    //for members related in round
+                    var send_array = Array();
+                    var send_cnt = 0;
+                    var chkbox = $(".checkSelect");
+
+                    for(i=0;i<chkbox.length;i++) {
+                        if (chkbox[i].checked == true){
+                            send_array[send_cnt] = chkbox[i].value;
+                            send_cnt++;
+                        }
+                    }
+                    $("#pay_round_members").val(send_array);
+
+                    //for member who paid
+                    var pay_round_mst_init = $(".custom-select-trigger").text();
+                    var pay_round_mst = $("select[name=pay_round_mst]").val();
+                    $("#pay_round_mst").val(pay_round_mst);
+
+                    var validation = checkValidation(round_nm, round_price, send_cnt, pay_round_mst_init);
+                    
+                    if (validation == "0") {
+                        return false;
+                    } else {
+                        $("#pay_review_list_init").css("display", "none");
+                        $("#pay_review_list_ajax").css("display", "");
+
+                        $.getJSON($SCRIPT_ROOT + '/add_pay_round', {
+                            pay_id: pay_id,
+                            round_nm: round_nm,
+                            round_price: round_price,
+                            pay_round_mst: pay_round_mst,
+                            pay_round_members: $("#pay_round_members").val()
+                        }, function(data) {
+                            pay_review_list = data.pay_review_list;
+                            
+                            drawPayRoundListAjax(pay_review_list);
+
+                            $("#round_nm").val("");
+                            $("#round_price").val("");
+
+                            $(".checkSelect").prop('checked', false);
+                            $("select[name=pay_round_mst]").val("");
+                            $(".custom-select-trigger").text("총무");
+                        });
+                        return false;
+                    }
+                });
+
+                $('button#result_enter').off().on('click', function() {
+                    var pay_id = $("#pay_id").val();
+                    var add_round_cnt = $("#pay_review_table_td1").get().length;
+
+                    if (add_round_cnt == "0") {
+                        alert("회차에 대한 정보를 하나 이상 등록해주세요!");
+                        return false;
+                    }
+
+                    $.post("/result_enter"
+                        , {'pay_id': $("#pay_id").val()}
+                        , function(data) {
+                            window.location.href = "/result/" + pay_id; 
+                    });
+                    return false;
+                });
+
+                // start) pay_round_box selectbox javascript
+                $(".custom-select").each(function() {
+                    var classes = $(this).attr("class"),
+                        id      = $(this).attr("id"),
+                        name    = $(this).attr("name");
+                    var template =  '<div class="' + classes + '">';
+                        template += '<span class="custom-select-trigger">' + $(this).attr("placeholder") + '</span>';
+                        template += '<div class="custom-options">';
+                        $(this).find("option").each(function() {
+                            template += '<span class="custom-option ' + $(this).attr("class") + '" data-value="' + $(this).attr("value") + '">' + $(this).html() + '</span>';
+                        });
+                    template += '</div></div>';
+                    
+                    $(this).wrap('<div class="custom-select-wrapper"></div>');
+                    $(this).hide();
+                    $(this).after(template);
+                });
+                $(".custom-option:first-of-type").hover(function() {
+                    $(this).parents(".custom-options").addClass("option-hover");
+                }, function() {
+                    $(this).parents(".custom-options").removeClass("option-hover");
+                });
+                $(".custom-select-trigger").on("click", function() {
+                    $('html').one('click',function() {
+                        $(".custom-select").removeClass("opened");
+                });
+                $(this).parents(".custom-select").toggleClass("opened");
+                    event.stopPropagation();
+                });
+                $(".custom-option").on("click", function() {
+                    $(this).parents(".custom-select-wrapper").find("select").val($(this).data("value"));
+                    $(this).parents(".custom-options").find(".custom-option").removeClass("selection");
+                    $(this).addClass("selection");
+                    $(this).parents(".custom-select").removeClass("opened");
+                    $(this).parents(".custom-select").find(".custom-select-trigger").text($(this).text());
+                });
+                // end) pay_round_box selectbox javascript
+            });
+
+            function drawPayRoundListAjax(pay_review_list) {
+                html = "<table class='pay_review_table' id='pay_review_table'><thead><td class='pay_review_table_td1' id='pay_review_table_td1'>회차명</td><td class='pay_review_table_td2' id='pay_review_table_td2'>금액</td><td class='pay_review_table_td3' id='pay_review_table_td3'>총무</td><td class='pay_review_table_td4' id='pay_review_table_td4'>참여자</td><td class='pay_review_table_td5' id='pay_review_table_td5'></td></thead><tbody>";
+
+                for(var i=0; i<pay_review_list.length; i++) {
+                    html = html + "<tr>" 
+                        + "<td><div class='pay_round' id='pay_round'><a style='text-decoration:none' href='javascript:fnRoundUpdate(" + pay_review_list[i][4] + ")'>" + pay_review_list[i][0] + "</a></div></td>" 
+                        + "<td><div class='pay_round' id='pay_round'><a style='text-decoration:none' href='javascript:fnRoundUpdate(" + pay_review_list[i][4] + ")'>" + pay_review_list[i][1] + "원</a></div></td>" 
+                        + "<td><div class='pay_round' id='pay_round'><a style='text-decoration:none' href='javascript:fnRoundUpdate(" + pay_review_list[i][4] + ")'>" + pay_review_list[i][2] + "</a></div></td>" 
+                        + "<td><div class='pay_round' id='pay_round'><a style='text-decoration:none' href='javascript:fnRoundUpdate(" + pay_review_list[i][4] + ")'>" + pay_review_list[i][3] + "</a></div></td>" 
+                        + "<td class='pay_round_delete'><img onclick=fnRoundDelete(" + pay_review_list[i][4] + ") src='../static/img/delete.png'></td>" 
+                        + "</tr>";
+                }
+                html = html + "</tbody></table></div>";
+                $("#pay_review_list_ajax").html(html);
+            }
+
+            function fnRoundDelete(idx) {
+                var validation = confirm("정말 삭제하시겠어요?\n해당 회차정보가 모두 삭제됩니다.");
+                    
+                if (validation == true) {
+                    var pay_id = $("#pay_id").val();
+                    var round_id = idx;
+
+                    $("#pay_review_list_init").css("display", "none");
+                    $("#pay_review_list_ajax").css("display", "");
+
+                    $.getJSON($SCRIPT_ROOT + '/delete_pay_round', {
+                        pay_id: pay_id,
+                        round_id: round_id
+                    }, function(data) {
+                        pay_review_list = data.pay_review_list;
+
+                        $("#pay_review_list_ajax").html("");
+
+                        drawPayRoundListAjax(pay_review_list);
+                    });
+                }
+            }
+            
+            function fnRoundUpdate(idx) {
+                //bring from db
+                $.getJSON($SCRIPT_ROOT + '/select_round_info', {
+                    round_id: idx
+                }, function(data) {
+                    //set name, price
+                    $("#round_nm").val(data.round_nm);
+                    $("#round_price").val(data.round_price);
+
+                    //set round members
+                    var pay_round_member = data.pay_round_member.split(',');
+                    for ( var i in pay_round_member ) {
+                        $('#pay_round_member'+pay_round_member[i]).prop('checked', true);
+                    }
+
+                    //set round mst
+                    $(".custom-select-wrapper").find("select").val(data.pay_round_mst);
+                    $(".custom-options").find(".custom-option").removeClass("selection");
+                    $(".custom-option").addClass("selection");
+                    $(".custom-select").removeClass("opened");
+                    $(".custom-select").find(".custom-select-trigger").text(data.pay_round_mst_nm);
+
+
+                    $("#add_pay_round").css("display", "none");
+                    $("#update_pay_round").css("display", "");
+
+                    $('button#update_pay_round').off().on('click', function() {
+                        var pay_id = $("#pay_id").val();
+
+                        //for round name, price
+                        var round_nm = $("#round_nm").val();
+                        var round_price = $("#round_price").val();
+                        
+                        //for members related in round
+                        var send_array = Array();
+                        var send_cnt = 0;
+                        var chkbox = $(".checkSelect");
+
+                        for(i=0;i<chkbox.length;i++) {
+                            if (chkbox[i].checked == true){
+                                send_array[send_cnt] = chkbox[i].value;
+                                send_cnt++;
+                            }
+                        }
+                        $("#pay_round_members").val(send_array);
+
+                        //for member who paid
+                        var pay_round_mst_init = $(".custom-select-trigger").text();
+                        var pay_round_mst = $("select[name=pay_round_mst]").val();
+                        $("#pay_round_mst").val(pay_round_mst);
+
+                        //var validation1 = checkValidation(round_nm, round_price, send_cnt, pay_round_mst_init);
+                        var validation2 = confirm("해당 회차의 정보들을 변경하시겠습니까?");
+                        
+                        if ((validation2 == true)) {
+                            $("#pay_review_list_init").css("display", "none");
+                            $("#pay_review_list_ajax").css("display", "");
+
+                            $("#add_pay_round").css("display", "");
+                            $("#update_pay_round").css("display", "none");
+
+                            $.getJSON($SCRIPT_ROOT + '/update_pay_round', {
+                                pay_id: pay_id,
+                                round_id: idx,
+                                round_nm: round_nm,
+                                round_price: round_price,
+                                pay_round_mst: pay_round_mst,
+                                pay_round_member: $("#pay_round_members").val()
+                            }, function(data) {
+                                pay_review_list = data.pay_review_list;
+
+                                $("#pay_review_list_ajax").html("");
+
+                                drawPayRoundListAjax(pay_review_list);
+                            });
+                            return false;
+                        }
+                    });
+                });
+                return false;
+            }
+
+            function onlyNumber(obj) {
+                $(obj).keyup(function(){$(this).val($(this).val().replace(/[^0-9]/g,""));});
+            }
+        </script>    
+
+    </head>
+    <body scroll=auto style="overflow-x:hidden">
+        <div class="container_round">
+            <h2>2단계</h2>
+            <div class="subtitle">기억의 조각을 맞춰봅시다!</div>
+            <form>
+                <input type="hidden" name="pay_id" id="pay_id" value={{pay_id}}> 
+                <input type="hidden" name="pay_name" id="pay_name" value={{pay_name}}> 
+                <input type="hidden" name="pay_round_members" id="pay_round_members" value={{pay_round_members}}> 
+                <input type="hidden" name="pay_round_mst" id="pay_round_mst" value={{pay_round_mst}}> 
+                
+                <input title="회차명을 입력해주세요" placeholder="ex) 1차-곱창" type="text" name="round_nm" id="round_nm" maxlength="10">
+                <input title="금액을 입력해주세요" placeholder="ex) 38000" type="text" name="round_price" id="round_price" maxlength="10" onkeydown="onlyNumber(this);">
+                
+                <!-- checkbox for all members -->
+                <br>
+                {% for member in pay_member_list %}
+                    <input style="width: 10px;" type="checkbox" class="checkSelect" name="pay_round_member" id="pay_round_member{{ member.pay_member_id }}" value="{{ member.pay_member_id }}"> 
+                        <div class="pay_member_chk">{{ member.pay_member_nm }}</div>
+                {% endfor %}
+
+                <!-- selectbox for pay_round_mst -->
+                <br>
+                <div class="pay_round_mst_selectbox">
+                    <select name="pay_round_mst" id="pay_round_mst" class="custom-select pay_round_mst" placeholder="총무">
+                    {% for member in pay_member_list %}
+                        <option value="{{ member.pay_member_id }}">{{ member.pay_member_nm }}</option>
+                    {% endfor %}
+                    </select>
+                </div>
+                <button type="button" class="add_pay_round" name="add_pay_round" id="add_pay_round">등록</button>
+                <button type="button" class="update_pay_round" name="update_pay_round" id="update_pay_round" style="display: none;">수정</button>
+            </form>
+
+            <div class="this_round_explain">현재 등록 내용</div>
+            
+            <!-- init show. replaced to pay_round_list_ajax when added -->
+            <div class="pay_review_list_init" id="pay_review_list_init">
+                <table class="pay_review_table" id="pay_review_table">
+                    <thead>
+                        {% if pay_review_list|length > 0 %}
+                            <td class="pay_review_table_td1" id="pay_review_table_td1">회차명</td>
+                            <td class="pay_review_table_td2" id="pay_review_table_td2">금액</td>
+                            <td class="pay_review_table_td3" id="pay_review_table_td3">총무</td>
+                            <td class="pay_review_table_td4" id="pay_review_table_td4">참여자</td>
+                            <td class="pay_review_table_td5" id="pay_review_table_td5"></td>
+                        {% endif %}
+                    </thead>
+                    <tbody>
+                        {% for i in range(0, pay_review_list|length) %}
+                            <tr>
+                                <td><div class="pay_round" id="pay_round"><a style="text-decoration:none" href='javascript:fnRoundUpdate("{{ pay_review_list[i][4] }}")'>{{ pay_review_list[i][0] }}</a></div></td>
+                                <td><div class="pay_round" id="pay_round"><a style="text-decoration:none" href='javascript:fnRoundUpdate("{{ pay_review_list[i][4] }}")'>{{ pay_review_list[i][1] }}원</a></div></td>
+                                <td><div class="pay_round" id="pay_round"><a style="text-decoration:none" href='javascript:fnRoundUpdate("{{ pay_review_list[i][4] }}")'>{{ pay_review_list[i][2] }}</a></div></td>
+                                <td><div class="pay_round" id="pay_round"><a style="text-decoration:none" href='javascript:fnRoundUpdate("{{ pay_review_list[i][4] }}")'>{{ pay_review_list[i][3] }}</a></div></td>
+                                <td class="pay_round_delete"><img onclick="fnRoundDelete('{{ pay_review_list[i][4] }}')" src="../static/img/delete.png"></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- replaced from pay_review_init when added -->
+            <div class="pay_review_list_ajax" id="pay_review_list_ajax" style="display: none;">
+            </div>
+
+            <br>
+            <button type="button" class="result_enter" name="result_enter" id="result_enter">n빵하기</button>
+        </div>
+    </body>
+</html>

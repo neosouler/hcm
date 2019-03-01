@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <title>황총무</title>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale1.0,user-scalable=no">
+        <link rel="shortcut icon" href="../static/img/favicon.ico">
+        <link href="../static/css/main.css" rel="stylesheet">
+        <script src="../static/js/jquery-1.12.4.js"></script>
+        <script src="../static/js/jquery-ui.js"></script>
+        <script type=text/javascript>
+            $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+        
+            $(function() {
+                $('input[type="text"]').keydown(function() {
+                    if (event.keyCode === 13) {
+                        event.preventDefault();
+                    }
+                });
+
+                $('button#new_payment').off().on('click', function() {
+                    window.location.href = "/"; 
+                });
+            });
+            
+        </script> 
+    </head>
+    <body>
+        <div class="container_result">
+            <h1>황총무</h1>
+            <div class="subtitle">n빵 종결자</div>
+            <br>
+            <br>
+
+            {% if final_list|length == 0 %}
+            <div class="this_round_explain">정산할 내역이 없습니다!</div>
+            {% endif %}
+            
+            <table class="pay_result_table">
+                <tbody>
+                    {% for list in final_list %}
+                        <tr>
+                            <td><div class="pay_result_highlight">{{ list[1] }}</div>님</td>
+                            <td><div class="pay_result_highlight">{{ list[2] }}</div>님에게</td>
+                            <td><div class="pay_result_highlight">{{ list[3] }}</div>원 보내세요~~</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            <button type="button" name="new_payment" id="new_payment">신규 정산</button>
+        </div>
+    </body>
+</html>
