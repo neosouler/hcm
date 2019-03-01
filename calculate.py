@@ -1,6 +1,35 @@
 import math
 from copy import deepcopy
 
+def find_the_chain(pay_calculate_step3):
+    pay_calculate_step3.sort()
+    for i in range(0, len(pay_calculate_step3)):
+        pay_calculate_step3[i].append("Y")
+        
+    reduced_list = []
+    for i in range(0, len(pay_calculate_step3)):
+            for j in range(0, len(pay_calculate_step3)):
+                    if(pay_calculate_step3[i][1] == pay_calculate_step3[j][2]):
+                            for k in range(0, len(pay_calculate_step3)):
+                                    if(pay_calculate_step3[k][1] == pay_calculate_step3[j][1] and pay_calculate_step3[k][2] == pay_calculate_step3[i][2]):
+                                        if(pay_calculate_step3[i][4] == "Y" and pay_calculate_step3[j][4] == "Y" and pay_calculate_step3[k][4] == "Y"):
+                                            if(pay_calculate_step3[i][3] > pay_calculate_step3[j][3]):
+                                                pay_calculate_step3[i][4] = "N"
+                                                pay_calculate_step3[j][4] = "N"
+                                                pay_calculate_step3[k][4] = "N"
+                                                reduced_list.append([pay_calculate_step3[i][0], pay_calculate_step3[i][1], pay_calculate_step3[i][2], pay_calculate_step3[i][3]-pay_calculate_step3[j][3]])
+                                                reduced_list.append([pay_calculate_step3[k][0], pay_calculate_step3[k][1], pay_calculate_step3[k][2], pay_calculate_step3[k][3]+pay_calculate_step3[j][3]])
+
+    pay_calculate_step4 = []
+    for i in range(0, len(pay_calculate_step3)):
+        if pay_calculate_step3[i][4] == "Y":
+            pay_calculate_step4.append([pay_calculate_step3[i][0], pay_calculate_step3[i][1], pay_calculate_step3[i][2], pay_calculate_step3[i][3]])
+
+    result_list = pay_calculate_step4 + reduced_list
+
+    return result_list
+
+
 def calculate(pay_id, pay_round_list):
     #하나의 pay_id에 대해서 각 회차별 from, to, price 표시 (from 인원만큼 생성. 금액 또한 나누기)
     #pay_id, from, to(결제자), price 
@@ -69,32 +98,24 @@ def calculate(pay_id, pay_round_list):
 
     ##### step4. 트랜잭션을 최소화 할 수 있는 놈을 찾자
     ##### 꼬리에 꼬리를 물 수 있을 때, 그 시작점(j)이 되는 놈이 앞쪽(i)에 더해지고, 뒷쪽(k)에서는 빼진다
-    pay_calculate_step4 = []
-    for i in range(0, len(pay_calculate_step3)):
-            for j in range(0, len(pay_calculate_step3)):
-                    if(pay_calculate_step3[i][1] == pay_calculate_step3[j][2]):
-                            #print(i)
-                            #print(j)
-                            #print(pay_calculate_step3[j][1])
-                            #print(pay_calculate_step3[i][2])
-                            for k in range(0, len(pay_calculate_step3)):
-                                    if(pay_calculate_step3[k][1] == pay_calculate_step3[j][1] and pay_calculate_step3[k][2] == pay_calculate_step3[i][2]):
-                                            #print(k)
-                                            pay_calculate_step4.append([pay_calculate_step3[i][0], pay_calculate_step3[i][1], pay_calculate_step3[i][2], pay_calculate_step3[i][3]-pay_calculate_step3[j][3]])
-                                            pay_calculate_step4.append([pay_calculate_step3[k][0], pay_calculate_step3[k][1], pay_calculate_step3[k][2], pay_calculate_step3[k][3]+pay_calculate_step3[j][3]])
-                    else:
-                            #꼬리를 무는 세트가 없을 때 그냥 넣어준다. (이중반복문이므로 index 같을 때만 append)
-                            if(i == j):
-                                    pay_calculate_step4.append([pay_calculate_step3[i][0], pay_calculate_step3[i][1], pay_calculate_step3[i][2], pay_calculate_step3[i][3]])
+    templist1 = find_the_chain(pay_calculate_step3)
+    templist2 = find_the_chain(templist1)
+    templist3 = find_the_chain(templist2)
+    templist4 = find_the_chain(templist3)
+    templist5 = find_the_chain(templist4)
+ 
+    pay_calculate_step4 = templist5
+    pay_calculate_step4.sort()
     
     #보내야 할 금액이 0원이면 아예 리스트 pop 그리고 완성
     index_list_step4 = []
     for i in range(0, len(pay_calculate_step4)):
             if(pay_calculate_step4[i][3] == 0):
                     index_list_step4.append(i)
-            
-    for index in index_list_step4:
-            pay_calculate_step4.pop(index)
+
+    if index_list_step4: 
+        for index in index_list_step4:
+                pay_calculate_step4.pop(index)
 
 
     return pay_calculate_step4
