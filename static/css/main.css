@@ -20,7 +20,7 @@ html, body {
 .container_index .subtitle { font-size: 16px; margin-top: 20px; }
 .container_index form { margin: 110px 30px 30px 30px; }
 .container_index input { width: 200px; height: 35px; margin-bottom: 30px; font-size: 15px; transition: all 0.2s ease-in-out; text-align: center; border: 1px solid black; border-radius: 10px;}
-.container_index button { width: 130px; height: 30px; font-size: 20px; background-color: black; color: #6bf; border: 1px solid black; border-radius: 10px; margin-top: 10px;}
+.container_index button { width: 200px; height: 30px; font-size: 20px; background-color: black; color: #6bf; border: 1px solid black; border-radius: 10px; margin-top: 10px;}
 
 /* pay.html */
 .container_pay { margin: 0 auto; width: 100%; height: 110%; background: #f1f1f1; color: black; overflow: hidden; text-align: center; }
