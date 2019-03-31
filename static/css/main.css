@@ -12,10 +12,10 @@ html, body {
   font-family: 'Noto Sans KR';
 }
   
-#cauly_ad_area { position: relative; text-align: center; bottom: 0px; width: 100%; z-index: 99px; margin-top: 20px;}
+#cauly_ad_area { position: fixed; text-align: center; bottom: 0px; width: 100%; z-index: 99px;}
 
 /* index.html */
-.container_index { margin: 0 auto; width: 100%; height: auto; background: black; color: white; overflow: hidden; text-align: center; }
+.container_index { margin: 0 auto; width: 100%; height: 100%; background: black; color: white; overflow: hidden; text-align: center; margin-bottom: 48px;}
 .container_index h1 { font-size: 50px; margin-top: 100px; }
 .container_index .subtitle { font-size: 16px; margin-top: 20px; }
 .container_index form { margin: 110px 30px 30px 30px; }
@@ -23,7 +23,7 @@ html, body {
 .container_index button { width: 200px; height: 30px; font-size: 20px; background-color: black; color: #6bf; border: 1px solid black; border-radius: 10px; margin-top: 10px;}
 
 /* pay.html */
-.container_pay { margin: 0 auto; width: 100%; height: auto; background: #f1f1f1; color: black; overflow: hidden; text-align: center; }
+.container_pay { margin: 0 auto; width: 100%; height: 100%; background: #f1f1f1; color: black; overflow: hidden; text-align: center; margin-bottom: 48px;}
 .container_pay h1 { font-size: 50px; margin-top: 100px; }
 .container_pay h2 { font-size: 30px; margin-top: 60px; }
 .container_pay .subtitle { font-size: 16px; margin-top: 20px; }
@@ -41,7 +41,7 @@ html, body {
 .container_pay .pay_member_delete img { height: 15px; width: 15px; margin: 7px 0 0 5px; }
 
 /* round.html */
-.container_round { margin: 0 auto; width: 100%; height: auto; background: AntiqueWhite; color: black; overflow: hidden; text-align: center; }
+.container_round { margin: 0 auto; width: 100%; height: 100%; background: AntiqueWhite; color: black; overflow: hidden; text-align: center;  margin-bottom: 48px;}
 .container_round h1 { font-size: 50px; margin-top: 100px; }
 .container_round h2 { font-size: 30px; margin-top: 60px; }
 .container_round .subtitle { font-size: 16px; margin-top: 20px; }
@@ -65,7 +65,7 @@ html, body {
 .container_round .pay_round_delete img { height: 15px; width: 15px; }
 
 /* result.html */
-.container_result { margin: 0 auto; width: 100%; height: auto; background: #56C5D0; color: black; overflow: hidden; text-align: center; }
+.container_result { margin: 0 auto; width: 100%; height: 100%; background: #56C5D0; color: black; overflow: hidden; text-align: center;  margin-bottom: 48px;}
 .container_result h1 { font-size: 50px; margin-top: 100px; }
 .container_result h2 { font-size: 30px; margin-top: 60px; }
 .container_result .subtitle { font-size: 16px; margin-top: 20px; }
