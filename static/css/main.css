@@ -53,7 +53,7 @@ html, body {
 .container_round .pay_member_chk { text-align: center; display: inline; vertical-align: 6px; font-size: 18px; }
 .container_round .add_pay_round { width: 130px; height: 30px; font-size: 20px; background-color: AntiqueWhite; color: #0070c9; border: 1px solid AntiqueWhite; border-radius: 10px; margin-top: 20px;}
 .container_round .update_pay_round { width: 130px; height: 30px; font-size: 20px; background-color: AntiqueWhite; color: #0070c9; border: 1px solid AntiqueWhite; border-radius: 10px; margin-top: 20px;}
-.container_round .result_enter { width: 130px; height: 30px; font-size: 20px; background-color: AntiqueWhite; color: tomato; border: 1px solid AntiqueWhite; border-radius: 10px; margin: 15px 0 30px 0;}
+.container_round .result_enter { width: 130px; height: 30px; font-size: 20px; background-color: AntiqueWhite; color: tomato; border: 1px solid AntiqueWhite; border-radius: 10px; margin: 15px 0 15px 0;}
 .container_round .pay_review_table { margin: auto; }
 .container_round .pay_review_table .pay_review_table_td1 { width: 20%; font-weight: 600; }
 .container_round .pay_review_table .pay_review_table_td2 { width: 20%; font-weight: 600; }
