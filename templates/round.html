@@ -310,42 +310,42 @@
                 </div>
                 <button type="button" class="add_pay_round" name="add_pay_round" id="add_pay_round">등록</button>
                 <button type="button" class="update_pay_round" name="update_pay_round" id="update_pay_round" style="display: none;">수정</button>
+            
+                <div class="this_round_explain">현재 등록 내용</div>
+            
+                <!-- init show. replaced to pay_round_list_ajax when added -->
+                <div class="pay_review_list_init" id="pay_review_list_init">
+                    <table class="pay_review_table" id="pay_review_table">
+                        <thead>
+                            {% if pay_review_list|length > 0 %}
+                                <td class="pay_review_table_td1" id="pay_review_table_td1">회차명</td>
+                                <td class="pay_review_table_td2" id="pay_review_table_td2">금액</td>
+                                <td class="pay_review_table_td3" id="pay_review_table_td3">총무</td>
+                                <td class="pay_review_table_td4" id="pay_review_table_td4">참여자</td>
+                                <td class="pay_review_table_td5" id="pay_review_table_td5"></td>
+                            {% endif %}
+                        </thead>
+                        <tbody>
+                            {% for i in range(0, pay_review_list|length) %}
+                                <tr>
+                                    <td><div class="pay_round" id="pay_round"><a style="text-decoration:none" href='javascript:fnRoundUpdate("{{ pay_review_list[i][4] }}")'>{{ pay_review_list[i][0] }}</a></div></td>
+                                    <td><div class="pay_round" id="pay_round"><a style="text-decoration:none" href='javascript:fnRoundUpdate("{{ pay_review_list[i][4] }}")'>{{ pay_review_list[i][1] }}원</a></div></td>
+                                    <td><div class="pay_round" id="pay_round"><a style="text-decoration:none" href='javascript:fnRoundUpdate("{{ pay_review_list[i][4] }}")'>{{ pay_review_list[i][2] }}</a></div></td>
+                                    <td><div class="pay_round" id="pay_round"><a style="text-decoration:none" href='javascript:fnRoundUpdate("{{ pay_review_list[i][4] }}")'>{{ pay_review_list[i][3] }}</a></div></td>
+                                    <td class="pay_round_delete"><img onclick="fnRoundDelete('{{ pay_review_list[i][4] }}')" src="../static/img/delete.png"></td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- replaced from pay_review_init when added -->
+                <div class="pay_review_list_ajax" id="pay_review_list_ajax" style="display: none;">
+                </div>
+
+                <button type="button" class="result_enter" name="result_enter" id="result_enter">n빵하기</button>
+                
             </form>
-
-            <div class="this_round_explain">현재 등록 내용</div>
-            
-            <!-- init show. replaced to pay_round_list_ajax when added -->
-            <div class="pay_review_list_init" id="pay_review_list_init">
-                <table class="pay_review_table" id="pay_review_table">
-                    <thead>
-                        {% if pay_review_list|length > 0 %}
-                            <td class="pay_review_table_td1" id="pay_review_table_td1">회차명</td>
-                            <td class="pay_review_table_td2" id="pay_review_table_td2">금액</td>
-                            <td class="pay_review_table_td3" id="pay_review_table_td3">총무</td>
-                            <td class="pay_review_table_td4" id="pay_review_table_td4">참여자</td>
-                            <td class="pay_review_table_td5" id="pay_review_table_td5"></td>
-                        {% endif %}
-                    </thead>
-                    <tbody>
-                        {% for i in range(0, pay_review_list|length) %}
-                            <tr>
-                                <td><div class="pay_round" id="pay_round"><a style="text-decoration:none" href='javascript:fnRoundUpdate("{{ pay_review_list[i][4] }}")'>{{ pay_review_list[i][0] }}</a></div></td>
-                                <td><div class="pay_round" id="pay_round"><a style="text-decoration:none" href='javascript:fnRoundUpdate("{{ pay_review_list[i][4] }}")'>{{ pay_review_list[i][1] }}원</a></div></td>
-                                <td><div class="pay_round" id="pay_round"><a style="text-decoration:none" href='javascript:fnRoundUpdate("{{ pay_review_list[i][4] }}")'>{{ pay_review_list[i][2] }}</a></div></td>
-                                <td><div class="pay_round" id="pay_round"><a style="text-decoration:none" href='javascript:fnRoundUpdate("{{ pay_review_list[i][4] }}")'>{{ pay_review_list[i][3] }}</a></div></td>
-                                <td class="pay_round_delete"><img onclick="fnRoundDelete('{{ pay_review_list[i][4] }}')" src="../static/img/delete.png"></td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- replaced from pay_review_init when added -->
-            <div class="pay_review_list_ajax" id="pay_review_list_ajax" style="display: none;">
-            </div>
-
-            <button type="button" class="result_enter" name="result_enter" id="result_enter">n빵하기</button>
-            
             <div id='cauly_ad_area'>
                 <script src='https://image.cauly.co.kr/websdk/caulyad_4.1.0.js' type='text/javascript'></script>
                 <script>
