@@ -53,16 +53,13 @@
             <script type='text/javascript'>
                 Kakao.init('a51be524f062dd5697991521987e17dd');
 
-                var kakaoImg = window.location.hostname + '/static/img/kakao_link.png';
-
                 Kakao.Link.createDefaultButton({
                     container: '#kakao-link-btn',
                     objectType: 'feed',
                     content: {
                         title: document.title,
                         description: '고생한 총무에게 어서 입금을~~',
-                        //imageUrl: kakaoImg,
-                        imageUrl: 'http://h-chongmoo.herokuapp.com/static/img/kakao_link.png',
+                        imageUrl: 'http://h-chongmoo.herokuapp.com/static/img/hcm.png',
                         link: {
                             webUrl: document.location.href,
                             mobileWebUrl: document.location.href
