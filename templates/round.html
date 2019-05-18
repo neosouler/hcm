@@ -292,8 +292,9 @@
                 <input title="회차명을 입력해주세요" placeholder="ex) 1차-곱창" type="text" name="round_nm" id="round_nm" maxlength="10">
                 <input title="금액을 입력해주세요" placeholder="ex) 38000" type="text" name="round_price" id="round_price" maxlength="10" onkeydown="onlyNumber(this);">
                 
+                <div class="this_round_member_explain">참여한 친구들을 모두 선택해주세요!</div>
+
                 <!-- checkbox for all members -->
-                <br>
                 {% for member in pay_member_list %}
                     <input style="width: 10px;" type="checkbox" class="checkSelect" name="pay_round_member" id="pay_round_member{{ member.pay_member_id }}" value="{{ member.pay_member_id }}"> 
                         <div class="pay_member_chk">{{ member.pay_member_nm }}</div>
