@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <title>황총무</title>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale1.0,user-scalable=no">
+        <link rel="shortcut icon" href="../static/img/favicon.ico">
+        <link href="../static/css/main.css" rel="stylesheet">
+        <script src="../static/js/jquery-1.12.4.js"></script>
+        <script src="../static/js/jquery-ui.js"></script>
+        <script type=text/javascript>
+            $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+        
+            $(function() {
+                $('input[type="text"]').keydown(function() {
+                    if (event.keyCode === 13) {
+                        event.preventDefault();
+                    }
+                });
+
+                $('button#add_pay_member').off().on('click', function() {
+                    var pay_id = $("#pay_id").val();
+                    var pay_member_nm = $("#pay_member_nm").val();
+
+                    if (pay_member_nm == "") {
+                        alert("이름을 입력해주세요!");
+                        return false;
+                    }
+                    
+                    $("#pay_member_list_init").css("display", "none");
+                    $("#pay_member_list_ajax").css("display", "");
+
+                    $.getJSON($SCRIPT_ROOT + '/add_pay_member', {
+                        pay_id: pay_id,
+                        pay_member_nm: pay_member_nm
+                    }, function(data) {
+                        pay_member_list = data.pay_member_list;
+                        pay_member_id = data.pay_member_id;
+                        
+                        drawPayMemberListAjax(pay_member_list, pay_member_id);
+
+                        $("#pay_member_nm").val("");
+                    });
+                    return false;
+                });
+
+                $('button#round_enter').off().on('click', function() {
+                    var pay_id = $("#pay_id").val();
+                    var add_member_cnt = $("#pay_member").get().length;
+                    
+                    if (add_member_cnt == "0") {
+                        alert("멤버를 한 명 이상 등록해주세요!");
+                        return false;
+                    }
+
+                    $.post("/round_enter"
+                        , {'pay_id': $("#pay_id").val()}
+                        , function(data) {
+                            window.location.href = "/round/" + pay_id; 
+                    });
+                    return false;
+                });
+            });
+
+            function drawPayMemberListAjax(pay_member_list, pay_member_id) {
+                html = "<table class='pay_member_list_table' id='pay_member_list_table'><tbody>";
+
+                for(var i=0; i<pay_member_list.length; i++) {
+                    html = html + "<tr>" 
+                            + "<td><div class='pay_member' id='pay_member'><a style='text-decoration:none' href='javascript:fnMemberUpdate(" + pay_member_id[i] + ")'>" + pay_member_list[i] + "</a></div></td>" 
+                            + "<td><div class='pay_member_delete' id='pay_member_delete'><img onclick=fnMemberDelete(" + pay_member_id[i] + ") src='../static/img/delete.png'></div></td>" 
+                            + "</tr>";
+                }
+                html = html + "</tbody></table>";
+
+                $("#pay_member_list_ajax").html(html);
+            }
+
+            function fnMemberDelete(idx) {
+                var validation = confirm("정말 삭제하시겠어요?\n해당 멤버가 포함된 모든 회차정보들 또한 삭제됩니다.");
+                    
+                if (validation == true) {
+                    var pay_id = $("#pay_id").val();
+                    var pay_member_id = idx;
+
+                    $("#pay_member_list_init").css("display", "none");
+                    $("#pay_member_list_ajax").css("display", "");
+
+                    $.getJSON($SCRIPT_ROOT + '/delete_pay_member', {
+                        pay_id: pay_id,
+                        pay_member_id: pay_member_id
+                    }, function(data) {
+                        pay_member_list = data.pay_member_list;
+                        pay_member_id = data.pay_member_id;
+
+                        $("#pay_member_list_ajax").html("");
+
+                        drawPayMemberListAjax(pay_member_list, pay_member_id);
+                    });
+                }
+            }
+
+            function fnMemberUpdate(idx) {
+                //bring from db
+                $.getJSON($SCRIPT_ROOT + '/select_member_nm', {
+                    pay_member_id: idx
+                }, function(data) {
+                    $("#pay_member_nm").val(data.pay_member_nm);
+
+                    $("#add_pay_member").css("display", "none");
+                    $("#update_pay_member").css("display", "");
+
+                    $('button#update_pay_member').off().on('click', function() {
+                        var pay_id = $("#pay_id").val();
+                        var pay_member_id = idx;
+                        var pay_member_nm = $("#pay_member_nm").val();
+
+                        if (pay_member_nm == "") {
+                            alert("이름을 입력해주세요!");
+                            return false;
+                        }
+
+                        $("#pay_member_list_init").css("display", "none");
+                        $("#pay_member_list_ajax").css("display", "");
+
+                        var validation = confirm("해당 멤버의 이름을 변경하시겠습니까?");
+                        
+                        if (validation == true) {
+                            $("#add_pay_member").css("display", "");
+                            $("#update_pay_member").css("display", "none");
+
+                            $.getJSON($SCRIPT_ROOT + '/update_pay_member', {
+                                pay_id: pay_id,
+                                pay_member_id: pay_member_id,
+                                pay_member_nm: pay_member_nm
+                            }, function(data) {
+                                pay_member_list = data.pay_member_list;
+                                pay_member_id = data.pay_member_id;
+                                
+                                drawPayMemberListAjax(pay_member_list, pay_member_id);
+
+                                $("#pay_member_nm").val("");
+                            });
+                            return false;
+                        }
+                    });
+                });
+                return false;
+            }
+        </script>
+    </head>
+    <body>
+        <div class="container_pay">
+            <h2>1단계</h2>
+            <div class="subtitle">정산 멤버들을 등록해주세요</div>
+            <form>
+                <input type="hidden" name="pay_id" id="pay_id" value={{pay_id}}> 
+                <input type="hidden" name="pay_name" id="pay_name" value={{pay_name}}> 
+                <input title="멤버 추가" placeholder="ex) 쫘니" type="text" name="pay_member_nm" id="pay_member_nm" maxlength="5">
+                <br>
+                <button type="button" class="add_pay_member" name="add_pay_member" id="add_pay_member">등록</button>
+                <button type="button" class="update_pay_member" name="update_pay_member" id="update_pay_member" style="display: none;">수정</button>
+                <br>
+                <div class="this_round_explain">현재 등록 멤버</div>
+
+                <!-- init show. replaced to pay_member_list_ajax when added -->
+                <div class="pay_member_list_init" id="pay_member_list_init">
+                    <table class="pay_member_list_table" id="pay_member_list_table">
+                        <tbody>
+                            {% for i in range(0, pay_member_list|length) %}
+                                <tr>
+                                    <td><div class="pay_member" id="pay_member"><a style="text-decoration:none" href='javascript:fnMemberUpdate("{{ pay_member_id[i] }}")'>{{ pay_member_list[i] }}</a></div></td>
+                                    <td><div class="pay_member_delete" id="pay_member_delete"><img onclick="fnMemberDelete('{{ pay_member_id[i] }}')" src="../static/img/delete.png"></div></td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- replaced from pay_member_list_init when added -->
+                <div class="pay_member_list_ajax" id="pay_member_list_ajax" style="display: none;">
+                </div>
+                
+                <button type="button" class="round_enter" name="round_enter" id="round_enter">다음</button>
+            </form>
+            <div id='cauly_ad_area'>
+                <script src='//image.cauly.co.kr/websdk/common/lasted/ads.min.js'></script>
+                <script>
+                  new CaulyAds({
+                    app_code:'LIGi62dN',
+                    placement:1,
+                    displayid:'cauly_ad_area',
+                    passback:function(){},
+                    success:function(){}
+                  });
+               </script>
+            </div>
+        </div>
+    </body>
+</html>

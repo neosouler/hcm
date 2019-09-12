@@ -3,7 +3,7 @@
     <title>황총무</title>
     <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale1.0,user-scalable=no">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
         <link rel="shortcut icon" href="../static/img/favicon.ico">
         <link href="../static/css/main.css" rel="stylesheet">
         <script src="../static/js/jquery-1.12.4.js"></script>
@@ -150,18 +150,18 @@
         </script>
     </head>
     <body>
-        <div class="container_pay">
-            <h2>1단계</h2>
-            <div class="subtitle">정산 멤버들을 등록해주세요</div>
-            <form>
+        <div class="pay_container">
+            <h2></h2>
+            <div class="subtitle"></div>
+            <form class="pay_form">
                 <input type="hidden" name="pay_id" id="pay_id" value={{pay_id}}> 
-                <input type="hidden" name="pay_name" id="pay_name" value={{pay_name}}> 
-                <input title="멤버 추가" placeholder="ex) 쫘니" type="text" name="pay_member_nm" id="pay_member_nm" maxlength="5">
-                <br>
+                <input type="text" />
+<!-- 
                 <button type="button" class="add_pay_member" name="add_pay_member" id="add_pay_member">등록</button>
+                 -->
                 <button type="button" class="update_pay_member" name="update_pay_member" id="update_pay_member" style="display: none;">수정</button>
                 <br>
-                <div class="this_round_explain">현재 등록 멤버</div>
+                <div class="this_round_explain"></div>
 
                 <!-- init show. replaced to pay_member_list_ajax when added -->
                 <div class="pay_member_list_init" id="pay_member_list_init">
@@ -196,5 +196,7 @@
                </script>
             </div>
         </div>
+
+        <script src="../static/js/pay.js"></script>
     </body>
 </html>
